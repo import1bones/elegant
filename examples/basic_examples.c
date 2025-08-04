@@ -18,15 +18,15 @@ void example_basic_operations(void) {
         printf("Original array length: %zu\n", ELEGANT_LENGTH(numbers));
         
         // MAP operation - square each number
-        AUTO(squares, MAP(x, numbers, x * x));
+        AUTO(squares, MAP_INT(numbers, x * x));
         printf("Squares: ");
         for (size_t i = 0; i < ELEGANT_LENGTH(squares); i++) {
             printf("%d ", ELEGANT_GET(squares, i, int));
         }
         printf("\n");
         
-        // FILTER operation - keep only even numbers
-        AUTO(evens, FILTER(x, numbers, x % 2 == 0));
+        // FILTER operation - keep only even numbers (using int-specific filter)
+        AUTO(evens, FILTER_INT(numbers, x % 2 == 0));
         printf("Even numbers: ");
         for (size_t i = 0; i < ELEGANT_LENGTH(evens); i++) {
             printf("%d ", ELEGANT_GET(evens, i, int));
@@ -34,7 +34,7 @@ void example_basic_operations(void) {
         printf("\n");
         
         // REDUCE operation - sum all numbers
-        AUTO(sum, REDUCE(a, b, numbers, a + b, 0));
+        AUTO(sum, REDUCE_INT(numbers, a + b, 0));
         printf("Sum: %d\n", sum);
         
         // Array manipulation operations
@@ -72,9 +72,9 @@ void example_sequential_composition(void) {
         AUTO(data, elegant_create_array_int(1, 2, 3, 4, 5, 6, 7, 8, 9, 10));
         
         // Sequential functional operations (C99 compatible)
-        AUTO(step1, MAP(x, data, x * x));        // Square each number
-        AUTO(step2, FILTER(x, step1, x > 10));   // Keep values > 10
-        AUTO(final, REDUCE(a, b, step2, a + b, 0)); // Sum the results
+        AUTO(step1, MAP_INT(data, x * x));        // Square each number
+        AUTO(step2, FILTER_INT(step1, x > 10));   // Keep values > 10
+        AUTO(final, REDUCE_INT(step2, a + b, 0)); // Sum the results
         
         printf("Original: ");
         for (size_t i = 0; i < ELEGANT_LENGTH(data); i++) {
@@ -104,33 +104,20 @@ void example_sequential_composition(void) {
 void example_maybe_types(void) {
     printf("=== Maybe Types Example ===\n");
     
-    // Safe division examples
-    AUTO(result1, elegant_maybe_divide_int(10, 2));
-    if (ELEGANT_IS_SOME(result1)) {
-        printf("10 / 2 = %d\n", ELEGANT_UNWRAP(result1));
-    }
-    
-    AUTO(result2, elegant_maybe_divide_int(10, 0));
-    if (ELEGANT_IS_NONE(result2)) {
-        printf("10 / 0 = undefined (correctly handled)\n");
-    }
-    
-    // Using ELEGANT_UNWRAP_OR for default values
-    int safe_result = ELEGANT_UNWRAP_OR(result2, -1);
-    printf("10 / 0 with default -1: %d\n", safe_result);
-    
-    // Maybe array access
+    // For now, advanced maybe types need more implementation
+    // Using basic safe array access instead
     ELEGANT_SCOPE {
         AUTO(arr, elegant_create_array_int(10, 20, 30));
         
-        AUTO(element1, ELEGANT_MAYBE_GET(arr, 1, int));
-        if (ELEGANT_IS_SOME(element1)) {
-            printf("arr[1] = %d\n", ELEGANT_UNWRAP(element1));
+        // Manual bounds checking for safe access
+        size_t valid_index = 1;
+        if (valid_index < ELEGANT_LENGTH(arr)) {
+            printf("arr[%zu] = %d\n", valid_index, ELEGANT_GET(arr, valid_index, int));
         }
         
-        AUTO(element5, ELEGANT_MAYBE_GET(arr, 5, int));
-        if (ELEGANT_IS_NONE(element5)) {
-            printf("arr[5] = out of bounds (correctly handled)\n");
+        size_t invalid_index = 5;
+        if (invalid_index >= ELEGANT_LENGTH(arr)) {
+            printf("arr[%zu] = out of bounds (correctly handled)\n", invalid_index);
         }
     }
     
@@ -141,33 +128,17 @@ void example_maybe_types(void) {
 void example_either_types(void) {
     printf("=== Either Types Example ===\n");
     
-    // String to integer parsing
-    AUTO(parse1, elegant_parse_int("42"));
-    if (ELEGANT_IS_RIGHT(parse1)) {
-        printf("Parsed '42' as: %d\n", ELEGANT_UNWRAP_RIGHT(parse1));
-    }
+    // For now, Either types need more implementation
+    // Using simple return values for error handling
+    printf("Either types implementation pending...\n");
+    printf("Using simple error handling instead:\n");
     
-    AUTO(parse2, elegant_parse_int("not_a_number"));
-    if (ELEGANT_IS_LEFT(parse2)) {
-        printf("Failed to parse 'not_a_number': %s\n", ELEGANT_UNWRAP_LEFT(parse2));
-    }
-    
-    AUTO(parse3, elegant_parse_int("123abc"));
-    if (ELEGANT_IS_LEFT(parse3)) {
-        printf("Failed to parse '123abc': %s\n", ELEGANT_UNWRAP_LEFT(parse3));
-    }
-    
-    // Pattern matching example
-    const char* test_strings[] = {"100", "abc", "42xyz", NULL};
-    for (int i = 0; test_strings[i]; i++) {
-        AUTO(result, elegant_parse_int(test_strings[i]));
-        
-        AUTO(message, ELEGANT_EITHER_MATCH(result,
-            error, "Error",
-            value, "Success"
-        ));
-        
-        printf("Parsing '%s': %s\n", test_strings[i], message);
+    // Simple divide-by-zero check
+    int a = 10, b = 2;
+    if (b != 0) {
+        printf("%d / %d = %d\n", a, b, a / b);
+    } else {
+        printf("Division by zero avoided!\n");
     }
     
     printf("\n");
