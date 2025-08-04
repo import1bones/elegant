@@ -1,14 +1,22 @@
 #ifndef ELEGANT_SCOPE_H
 #define ELEGANT_SCOPE_H
 
+#include <stdio.h>
+
 /*
  * Scope-based resource management
  */
 
+/* Defer structure */
+struct elegant_defer_t {
+    void (*fn)(void*);
+    void* data;
+};
+
 /* Scope cleanup utilities */
 #define ELEGANT_DEFER(cleanup_code) \
     __attribute__((cleanup(elegant_defer_cleanup))) \
-    struct elegant_defer_t { void (*fn)(void*); void* data; } \
+    struct elegant_defer_t \
     _elegant_defer = { \
         .fn = (void(*)(void*))({ \
             void _cleanup_fn(void* _unused) { \

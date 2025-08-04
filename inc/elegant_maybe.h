@@ -1,6 +1,8 @@
 #ifndef ELEGANT_MAYBE_H
 #define ELEGANT_MAYBE_H
 
+#include <stdbool.h>
+
 /*
  * Maybe/Option types for safe error handling
  */
@@ -17,7 +19,7 @@
     ((ELEGANT_MAYBE(type)){.has_value = true, .value = (val)})
 
 #define ELEGANT_NONE(type) \
-    ((ELEGANT_MAYBE(type)){.has_value = false, .value = {0}})
+    ((ELEGANT_MAYBE(type)){.has_value = false, .value = (type){0}})
 
 /* Maybe utility macros */
 #define ELEGANT_IS_SOME(maybe) ((maybe).has_value)
@@ -42,18 +44,21 @@
 /* Common Maybe operations */
 
 /* Safe division */
-static inline ELEGANT_MAYBE(int) elegant_maybe_divide_int(int a, int b) {
+typedef ELEGANT_MAYBE(int) elegant_maybe_int_t;
+typedef ELEGANT_MAYBE(double) elegant_maybe_double_t;
+
+static inline elegant_maybe_int_t elegant_maybe_divide_int(int a, int b) {
     if (b == 0) {
-        return ELEGANT_NONE(int);
+        return (elegant_maybe_int_t){.has_value = false, .value = 0};
     }
-    return ELEGANT_SOME(int, a / b);
+    return (elegant_maybe_int_t){.has_value = true, .value = a / b};
 }
 
-static inline ELEGANT_MAYBE(double) elegant_maybe_divide_double(double a, double b) {
+static inline elegant_maybe_double_t elegant_maybe_divide_double(double a, double b) {
     if (b == 0.0) {
-        return ELEGANT_NONE(double);
+        return (elegant_maybe_double_t){.has_value = false, .value = 0.0};
     }
-    return ELEGANT_SOME(double, a / b);
+    return (elegant_maybe_double_t){.has_value = true, .value = a / b};
 }
 
 /* Maybe array access */

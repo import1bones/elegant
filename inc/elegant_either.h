@@ -1,6 +1,10 @@
 #ifndef ELEGANT_EITHER_H
 #define ELEGANT_EITHER_H
 
+#include <stdbool.h>
+#include <stdlib.h>
+#include <limits.h>
+
 /*
  * Either types for error handling with error values
  */
@@ -17,10 +21,10 @@
 
 /* Either constructor macros */
 #define ELEGANT_LEFT(left_type, val) \
-    ((ELEGANT_EITHER(left_type, __typeof__(val))){.is_right = false, .value.left = (val)})
+    ((ELEGANT_EITHER(left_type, int)){.is_right = false, .value.left = (val)})
 
 #define ELEGANT_RIGHT(right_type, val) \
-    ((ELEGANT_EITHER(__typeof__(val), right_type)){.is_right = true, .value.right = (val)})
+    ((ELEGANT_EITHER(const char*, right_type)){.is_right = true, .value.right = (val)})
 
 /* Either utility macros */
 #define ELEGANT_IS_LEFT(either) (!(either).is_right)
@@ -60,28 +64,31 @@
 
 /* Common Either operations */
 
+/* Define the parse result type */
+typedef ELEGANT_EITHER(const char*, int) elegant_parse_int_result_t;
+
 /* Safe string to integer parsing */
-static inline ELEGANT_EITHER(const char*, int) elegant_parse_int(const char* str) {
+static inline elegant_parse_int_result_t elegant_parse_int(const char* str) {
     if (!str) {
-        return ELEGANT_LEFT(const char*, "Null string");
+        return (elegant_parse_int_result_t){.is_right = false, .value.left = "Null string"};
     }
     
     char* endptr;
     long val = strtol(str, &endptr, 10);
     
     if (endptr == str) {
-        return ELEGANT_LEFT(const char*, "No digits found");
+        return (elegant_parse_int_result_t){.is_right = false, .value.left = "No digits found"};
     }
     
     if (*endptr != '\0') {
-        return ELEGANT_LEFT(const char*, "Invalid characters after number");
+        return (elegant_parse_int_result_t){.is_right = false, .value.left = "Invalid characters after number"};
     }
     
     if (val > INT_MAX || val < INT_MIN) {
-        return ELEGANT_LEFT(const char*, "Number out of range");
+        return (elegant_parse_int_result_t){.is_right = false, .value.left = "Number out of range"};
     }
     
-    return ELEGANT_RIGHT(int, (int)val);
+    return (elegant_parse_int_result_t){.is_right = true, .value.right = (int)val};
 }
 
 #endif /* ELEGANT_EITHER_H */

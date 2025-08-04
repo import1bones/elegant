@@ -69,9 +69,10 @@ install: library
 	sudo ldconfig
 
 # Test the examples
-test: examples
-	@echo "Running basic examples..."
-	./$(BUILDDIR)/basic_examples
+test: $(BUILDDIR)/functional_demo
+	@echo "Running Elegant Library v0.0.1 functional test..."
+	./$(BUILDDIR)/functional_demo
+	@echo "✓ Functional operations test passed!"
 
 # Clean build files
 clean:

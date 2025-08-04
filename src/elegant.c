@@ -28,7 +28,7 @@ elegant_memory_mode_t elegant_get_memory_mode(void) {
 }
 
 size_t elegant_get_allocated_bytes(void) {
-    return elegant_allocated_bytes;found
+    return elegant_allocated_bytes;
 }
 
 /* Memory allocation wrappers */
@@ -240,8 +240,232 @@ void elegant_memory_debug_dump(void) {
     printf("  Active allocations: %zu\n", elegant_allocation_count);
     printf("  Current memory mode: %d\n", elegant_current_memory_mode);
 }
-
-size_t elegant_memory_debug_get_allocations(void) {
-    return elegant_allocation_count;
-}
 #endif
+
+bool elegant_scope_is_valid(void) {
+    return elegant_current_scope != NULL;
+}
+
+/* Collection operation implementations */
+
+elegant_array_t* elegant_map_int(elegant_array_t* src, int (*func)(int)) {
+    if (!src || !func) return NULL;
+    
+    size_t len = elegant_array_get_length(src);
+    elegant_array_t* result = elegant_array_create(sizeof(int), len);
+    if (!result) return NULL;
+    
+    int* src_data = (int*)elegant_array_get_data(src);
+    int* dst_data = (int*)elegant_array_get_data(result);
+    
+    for (size_t i = 0; i < len; i++) {
+        dst_data[i] = func(src_data[i]);
+    }
+    
+    return result;
+}
+
+elegant_array_t* elegant_map_float(elegant_array_t* src, float (*func)(float)) {
+    if (!src || !func) return NULL;
+    
+    size_t len = elegant_array_get_length(src);
+    elegant_array_t* result = elegant_array_create(sizeof(float), len);
+    if (!result) return NULL;
+    
+    float* src_data = (float*)elegant_array_get_data(src);
+    float* dst_data = (float*)elegant_array_get_data(result);
+    
+    for (size_t i = 0; i < len; i++) {
+        dst_data[i] = func(src_data[i]);
+    }
+    
+    return result;
+}
+
+elegant_array_t* elegant_map_double(elegant_array_t* src, double (*func)(double)) {
+    if (!src || !func) return NULL;
+    
+    size_t len = elegant_array_get_length(src);
+    elegant_array_t* result = elegant_array_create(sizeof(double), len);
+    if (!result) return NULL;
+    
+    double* src_data = (double*)elegant_array_get_data(src);
+    double* dst_data = (double*)elegant_array_get_data(result);
+    
+    for (size_t i = 0; i < len; i++) {
+        dst_data[i] = func(src_data[i]);
+    }
+    
+    return result;
+}
+
+elegant_array_t* elegant_filter_int(elegant_array_t* src, int (*predicate)(int)) {
+    if (!src || !predicate) return NULL;
+    
+    size_t len = elegant_array_get_length(src);
+    int* src_data = (int*)elegant_array_get_data(src);
+    
+    // First pass: count matching elements
+    size_t count = 0;
+    for (size_t i = 0; i < len; i++) {
+        if (predicate(src_data[i])) count++;
+    }
+    
+    // Create result array
+    elegant_array_t* result = elegant_array_create(sizeof(int), count);
+    if (!result) return NULL;
+    
+    // Second pass: copy matching elements
+    int* dst_data = (int*)elegant_array_get_data(result);
+    size_t idx = 0;
+    for (size_t i = 0; i < len; i++) {
+        if (predicate(src_data[i])) {
+            dst_data[idx++] = src_data[i];
+        }
+    }
+    
+    return result;
+}
+
+elegant_array_t* elegant_filter_float(elegant_array_t* src, int (*predicate)(float)) {
+    if (!src || !predicate) return NULL;
+    
+    size_t len = elegant_array_get_length(src);
+    float* src_data = (float*)elegant_array_get_data(src);
+    
+    // First pass: count matching elements
+    size_t count = 0;
+    for (size_t i = 0; i < len; i++) {
+        if (predicate(src_data[i])) count++;
+    }
+    
+    // Create result array
+    elegant_array_t* result = elegant_array_create(sizeof(float), count);
+    if (!result) return NULL;
+    
+    // Second pass: copy matching elements
+    float* dst_data = (float*)elegant_array_get_data(result);
+    size_t idx = 0;
+    for (size_t i = 0; i < len; i++) {
+        if (predicate(src_data[i])) {
+            dst_data[idx++] = src_data[i];
+        }
+    }
+    
+    return result;
+}
+
+elegant_array_t* elegant_filter_double(elegant_array_t* src, int (*predicate)(double)) {
+    if (!src || !predicate) return NULL;
+    
+    size_t len = elegant_array_get_length(src);
+    double* src_data = (double*)elegant_array_get_data(src);
+    
+    // First pass: count matching elements
+    size_t count = 0;
+    for (size_t i = 0; i < len; i++) {
+        if (predicate(src_data[i])) count++;
+    }
+    
+    // Create result array
+    elegant_array_t* result = elegant_array_create(sizeof(double), count);
+    if (!result) return NULL;
+    
+    // Second pass: copy matching elements
+    double* dst_data = (double*)elegant_array_get_data(result);
+    size_t idx = 0;
+    for (size_t i = 0; i < len; i++) {
+        if (predicate(src_data[i])) {
+            dst_data[idx++] = src_data[i];
+        }
+    }
+    
+    return result;
+}
+
+int elegant_reduce_int(elegant_array_t* src, int (*func)(int, int), int initial) {
+    if (!src || !func) return initial;
+    
+    size_t len = elegant_array_get_length(src);
+    int* src_data = (int*)elegant_array_get_data(src);
+    
+    int accumulator = initial;
+    for (size_t i = 0; i < len; i++) {
+        accumulator = func(accumulator, src_data[i]);
+    }
+    
+    return accumulator;
+}
+
+float elegant_reduce_float(elegant_array_t* src, float (*func)(float, float), float initial) {
+    if (!src || !func) return initial;
+    
+    size_t len = elegant_array_get_length(src);
+    float* src_data = (float*)elegant_array_get_data(src);
+    
+    float accumulator = initial;
+    for (size_t i = 0; i < len; i++) {
+        accumulator = func(accumulator, src_data[i]);
+    }
+    
+    return accumulator;
+}
+
+double elegant_reduce_double(elegant_array_t* src, double (*func)(double, double), double initial) {
+    if (!src || !func) return initial;
+    
+    size_t len = elegant_array_get_length(src);
+    double* src_data = (double*)elegant_array_get_data(src);
+    
+    double accumulator = initial;
+    for (size_t i = 0; i < len; i++) {
+        accumulator = func(accumulator, src_data[i]);
+    }
+    
+    return accumulator;
+}
+
+int* elegant_find_int(elegant_array_t* src, int (*predicate)(int)) {
+    if (!src || !predicate) return NULL;
+    
+    size_t len = elegant_array_get_length(src);
+    int* src_data = (int*)elegant_array_get_data(src);
+    
+    for (size_t i = 0; i < len; i++) {
+        if (predicate(src_data[i])) {
+            return &src_data[i];
+        }
+    }
+    
+    return NULL;
+}
+
+float* elegant_find_float(elegant_array_t* src, int (*predicate)(float)) {
+    if (!src || !predicate) return NULL;
+    
+    size_t len = elegant_array_get_length(src);
+    float* src_data = (float*)elegant_array_get_data(src);
+    
+    for (size_t i = 0; i < len; i++) {
+        if (predicate(src_data[i])) {
+            return &src_data[i];
+        }
+    }
+    
+    return NULL;
+}
+
+double* elegant_find_double(elegant_array_t* src, int (*predicate)(double)) {
+    if (!src || !predicate) return NULL;
+    
+    size_t len = elegant_array_get_length(src);
+    double* src_data = (double*)elegant_array_get_data(src);
+    
+    for (size_t i = 0; i < len; i++) {
+        if (predicate(src_data[i])) {
+            return &src_data[i];
+        }
+    }
+    
+    return NULL;
+}
