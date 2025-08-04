@@ -1,0 +1,123 @@
+INSTALLATION INSTRUCTIONS
+========================
+
+Elegant Functional Programming Library v0.0.1
+
+## Quick Installation
+
+For most systems, the standard autotools installation process works:
+
+    ./configure
+    make
+    make check
+    sudo make install
+    sudo ldconfig    # On Linux systems
+
+## Prerequisites
+
+- C99-compatible compiler (GCC, Clang)
+- GNU Autotools (autoconf, automake, libtool)
+- GNU make
+- Standard C library and libm (math library)
+
+### Installing Prerequisites
+
+Ubuntu/Debian:
+    sudo apt-get install build-essential autoconf automake libtool
+
+CentOS/RHEL/Fedora:
+    sudo yum install gcc autoconf automake libtool
+    # or on newer versions:
+    sudo dnf install gcc autoconf automake libtool
+
+macOS (with Homebrew):
+    brew install autoconf automake libtool
+
+## Configuration Options
+
+    --enable-debug          Enable debug mode with memory tracking
+    --enable-examples       Build example programs
+    --prefix=PREFIX         Install to PREFIX [/usr/local]
+    --libdir=DIR           Install libraries to DIR [PREFIX/lib]
+    --includedir=DIR       Install headers to DIR [PREFIX/include]
+
+## Development Installation
+
+For development work with full debugging:
+
+    ./configure --enable-debug --enable-examples --prefix=$HOME/local
+    make
+    make check
+    make install
+
+## Cross-Platform Notes
+
+### Linux
+Standard installation works on all major distributions.
+
+### macOS
+Use Homebrew or MacPorts to install autotools, then standard build.
+
+### Windows (MSYS2/MinGW-w64)
+Install MSYS2, then install build tools:
+    pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-autotools
+    ./configure
+    make
+
+### FreeBSD/OpenBSD
+Install autotools from ports/packages, then standard build.
+
+## Post-Installation
+
+### Verify Installation
+
+    pkg-config --modversion elegant
+    pkg-config --cflags --libs elegant
+
+### Test Installation
+
+Create a simple test program:
+
+    #include <elegant.h>
+    int main() {
+        AUTO(arr, elegant_create_array_int(1, 2, 3));
+        return 0;
+    }
+
+Compile and run:
+    gcc test.c $(pkg-config --cflags --libs elegant) -o test
+    ./test
+
+## Uninstallation
+
+    sudo make uninstall
+
+## Troubleshooting
+
+### Missing autotools
+Install autoconf, automake, and libtool for your platform.
+
+### Build failures
+Try a clean rebuild:
+    make distclean
+    ./configure [options]
+    make
+
+### Permission errors during installation
+Use sudo for system-wide installation or install to a user directory:
+    ./configure --prefix=$HOME/local
+
+### Library not found at runtime
+Update library path:
+    sudo ldconfig                    # Linux
+    export DYLD_LIBRARY_PATH=...    # macOS
+    export LD_LIBRARY_PATH=...      # Other Unix
+
+## Support
+
+For build issues, check:
+- That you have all prerequisites installed
+- That you're using a supported compiler
+- The configure output for any error messages
+
+For more information, see README.md and docs/overview.md.

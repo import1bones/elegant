@@ -6,7 +6,7 @@ SUBDIRS += examples
 endif
 
 # Documentation and distribution files
-EXTRA_DIST = README.md LICENSE docs/overview.md
+EXTRA_DIST = README.md LICENSE INSTALL NEWS docs/overview.md
 
 # Include headers in distribution
 elegantincludedir = $(includedir)/elegant

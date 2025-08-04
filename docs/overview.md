@@ -1,13 +1,83 @@
-# Elegant Documentation
+# Elegant Documentation v0.0.1
 
-Elegant ### Reference Counting
+Elegant is a functional programming library for C inspired by Haskell, designed to bring Haskell-like functional programming paradigms to the C language. It provides a set of macros and pure functions to enable functional programming features in C, making it easier to write code in a functional, declarative style with automatic memory management and type safety.
+
+## Building and Installation
+
+### Quick Start
+
+```bash
+# Configure the build system
+./configure --enable-debug --enable-examples
+
+# Build the library and examples
+make
+
+# Run the test suite
+make check
+
+# Install system-wide (optional)
+sudo make install
+```
+
+### Build Requirements
+
+- **C Compiler**: GCC 4.9+, Clang 3.5+, or compatible C99 compiler
+- **Build Tools**: GNU Autotools (autoconf, automake, libtool), make
+- **System Libraries**: Standard C library, libm (math library)
+
+### Configure Options
+
+The autotools build system provides several configuration options:
+
+```bash
+# Enable debug mode with memory tracking and assertions
+./configure --enable-debug
+
+# Build example programs in examples/ directory
+./configure --enable-examples  
+
+# Custom installation prefix
+./configure --prefix=/opt/elegant
+
+# Show all configuration options
+./configure --help
+```
+
+### Development Workflow
+
+```bash
+# Full development build
+./configure --enable-debug --enable-examples
+make clean && make
+make check
+
+# Test installation to staging area
+make DESTDIR=/tmp/elegant-test install
+
+# Create distribution package
+make dist
+```
+
+### Using the Library
+
+After installation, include in your C programs:
+
 ```c
-ELEGANT_SET_MODE(REFERENCE_COUNTING);
-AUTO(shared_data, ELEGANT_ARRAY(int, 1, 2, 3));
-AUTO(view1, shared_data);  // ref count increases
-AUTO(view2, shared_data);  // ref count increases  
-// Memory freed when last reference goes out of scope
-```ibrary inspired by Haskell, designed to bring Haskell-like functional programming paradigms to the C language. It provides a set of macros and pure functions to enable functional programming features in C, making it easier to write code in a functional, declarative style with automatic memory management and type safety.
+#include <elegant.h>
+
+// Your functional C code here
+```
+
+Compile your programs with:
+
+```bash
+# Using pkg-config (recommended)
+gcc myprogram.c $(pkg-config --cflags --libs elegant) -o myprogram
+
+# Manual linking
+gcc myprogram.c -lelegant -lm -o myprogram
+```
 
 ## Features
 

@@ -1,0 +1,91 @@
+Elegant Functional Programming Library - NEWS
+===========================================
+
+## Version 0.0.1 (2025-08-04)
+
+### Initial Release
+
+This is the first release of the Elegant functional programming library for C.
+
+#### Features Implemented
+
+- **Core Functional Operations**
+  - MAP operations for int, float, double types
+  - FILTER operations with predicate functions  
+  - REDUCE operations with accumulator functions
+  - Array creation and manipulation functions
+
+- **Memory Management**
+  - Automatic memory management with scope-based cleanup
+  - Stack arena allocation (default mode)
+  - Reference counting mode for shared data
+  - Memory usage tracking and debugging
+
+- **Array Operations**
+  - Safe array access with bounds checking
+  - Array length, reverse, slice operations
+  - Type-safe array creation macros
+
+- **Build System**
+  - Professional GNU Autotools build system
+  - Cross-platform support (Linux, macOS, Windows, *BSD)
+  - pkg-config integration for easy linking
+  - Configurable debug and example builds
+  - Comprehensive test suite
+
+- **Type System**
+  - C99 compatible implementation
+  - GCC statement expressions for inline operations
+  - __typeof__ support for type inference
+  - AUTO macro for automatic type deduction
+
+- **Documentation**
+  - Comprehensive API documentation
+  - Working example programs
+  - Installation and usage guides
+  - Cross-platform build instructions
+
+#### Examples Included
+
+- **functional_demo.c**: Demonstrates core MAP/FILTER/REDUCE operations
+- **basic_examples.c**: Shows basic usage patterns and memory management
+- Working test suite validates functionality
+
+#### Platform Support
+
+- Linux (tested on Ubuntu/Debian)
+- macOS (with Xcode command line tools)
+- Windows (MSYS2/MinGW-w64)
+- FreeBSD/OpenBSD (native support)
+
+#### Dependencies
+
+- C99-compatible compiler (GCC 4.9+, Clang 3.5+)
+- GNU Autotools (autoconf, automake, libtool)
+- Standard C library and libm
+
+#### Installation
+
+Standard autotools workflow:
+```
+./configure --enable-debug --enable-examples
+make
+make check
+sudo make install
+```
+
+#### Known Limitations
+
+- Maybe/Either types are partially implemented
+- Some advanced functional features are still in development
+- Generic FILTER/MAP macros have type restrictions
+
+#### Future Plans
+
+- Complete Maybe/Either type implementation
+- Enhanced error handling
+- More functional programming primitives
+- Performance optimizations
+- Extended type system support
+
+This release provides a solid foundation for functional programming in C with automatic memory management and a professional build system.
