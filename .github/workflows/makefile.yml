@@ -14,7 +14,10 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: configure
+    - name: Generate configure
+      run: ./autogen.sh
+
+    - name: Configure
       run: ./configure
 
     - name: Install dependencies
