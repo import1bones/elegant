@@ -56,3 +56,41 @@ dkms.conf
 
 # project build directories
 build/
+lib/
+
+# Autotools generated files
+/autom4te.cache/
+/aclocal.m4
+/compile
+/config.guess
+/config.h
+/config.h.in
+/config.h.in~
+/config.log
+/config.status
+/config.sub
+/configure
+/configure~
+/depcomp
+/install-sh
+/libtool
+/ltmain.sh
+/missing
+/stamp-h1
+Makefile
+Makefile.in
+.deps/
+.libs/
+*.la
+*.lo
+/build-aux/
+/m4/
+
+# pkg-config file
+elegant.pc
+
+# Distribution files
+elegant-*.tar.gz
+
+# Backup files
+*~

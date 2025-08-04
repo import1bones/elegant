@@ -1,0 +1,12 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: Elegant
+Description: Functional programming library for C
+Version: @VERSION@
+Requires:
+Libs: -L${libdir} -lelegant
+Libs.private: -lm
+Cflags: -I${includedir}/elegant
