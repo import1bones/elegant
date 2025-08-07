@@ -18,16 +18,7 @@ elegant_array_t* functional_quicksort(elegant_array_t* arr) {
     AUTO(sorted_greater, functional_quicksort(greater));
 
     // Concatenate: sorted_less + equal + sorted_greater
-    size_t l1 = ELEGANT_LENGTH(sorted_less);
-    size_t l2 = ELEGANT_LENGTH(equal);
-    size_t l3 = ELEGANT_LENGTH(sorted_greater);
-    size_t total = l1 + l2 + l3;
-    elegant_array_t* result = elegant_create_array_impl(sizeof(int), NULL, total);
-    int* data = (int*)ELEGANT_RAW_PTR(result);
-    if (l1) memcpy(data, ELEGANT_RAW_PTR(sorted_less), l1 * sizeof(int));
-    if (l2) memcpy(data + l1, ELEGANT_RAW_PTR(equal), l2 * sizeof(int));
-    if (l3) memcpy(data + l1 + l2, ELEGANT_RAW_PTR(sorted_greater), l3 * sizeof(int));
-    return result;
+    return ELEGANT_CONCAT(sorted_less, equal, sorted_greater);
 }
 
 int main() {

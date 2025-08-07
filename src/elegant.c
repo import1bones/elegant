@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <assert.h>
 #include <limits.h>
+#include <stdarg.h>
+#include <errno.h>
 
 /* Thread-local memory mode */
 __thread elegant_memory_mode_t elegant_current_memory_mode = ELEGANT_MEMORY_STACK_ARENA;
@@ -17,6 +19,37 @@ __thread elegant_scope_frame_t* elegant_current_scope = NULL;
 /* Thread-local memory statistics */
 __thread size_t elegant_allocated_bytes = 0;
 __thread size_t elegant_allocation_count = 0;
+
+/* Safe memory copy implementation */
+int elegant_memcpy_safe(void* dest, size_t dest_size, const void* src, size_t copy_size) {
+    if (!dest || !src) {
+        errno = EINVAL;
+        return EINVAL;
+    }
+    
+    if (copy_size == 0) {
+        return 0;  // Success, nothing to copy
+    }
+    
+    if (copy_size > dest_size) {
+        errno = ERANGE;
+        return ERANGE;  // Buffer overflow
+    }
+    
+    // Check for overlapping memory regions (like memmove)
+    const char* src_bytes = (const char*)src;
+    char* dest_bytes = (char*)dest;
+    
+    if ((src_bytes < dest_bytes && src_bytes + copy_size > dest_bytes) ||
+        (dest_bytes < src_bytes && dest_bytes + dest_size > src_bytes)) {
+        // Use memmove for overlapping regions
+        memmove(dest, src, copy_size);
+    } else {
+        memcpy(dest, src, copy_size);
+    }
+    
+    return 0;  // Success
+}
 
 /* Memory management functions */
 void elegant_set_memory_mode(elegant_memory_mode_t mode) {
@@ -132,7 +165,11 @@ elegant_array_t* elegant_array_copy(elegant_array_t* arr) {
     if (!new_arr) return NULL;
     
     if (arr->data && new_arr->data) {
-        memcpy(new_arr->data, arr->data, arr->length * arr->element_size);
+        size_t copy_bytes = arr->length * arr->element_size;
+        if (elegant_memcpy_safe(new_arr->data, copy_bytes, arr->data, copy_bytes) != 0) {
+            elegant_array_destroy(new_arr);
+            return NULL;
+        }
     }
     
     new_arr->destructor = arr->destructor;
@@ -169,7 +206,11 @@ elegant_array_t* elegant_create_array_impl(size_t element_size, void* data, size
     if (!arr) return NULL;
     
     if (data && arr->data && length > 0) {
-        memcpy(arr->data, data, length * element_size);
+        size_t copy_bytes = length * element_size;
+        if (elegant_memcpy_safe(arr->data, copy_bytes, data, copy_bytes) != 0) {
+            elegant_array_destroy(arr);
+            return NULL;
+        }
     }
     
     return arr;
@@ -468,4 +509,59 @@ double* elegant_find_double(elegant_array_t* src, int (*predicate)(double)) {
     }
     
     return NULL;
+}
+
+/* Array concatenation */
+elegant_array_t* elegant_concat_arrays(size_t count, ...) {
+    if (count == 0) return NULL;
+    
+    va_list args;
+    va_start(args, count);
+    
+    // First pass: calculate total length and get element size
+    size_t total_length = 0;
+    size_t element_size = 0;
+    elegant_array_t* arrays[count];
+    
+    for (size_t i = 0; i < count; i++) {
+        arrays[i] = va_arg(args, elegant_array_t*);
+        if (arrays[i]) {
+            size_t len = elegant_array_get_length(arrays[i]);
+            total_length += len;
+            if (element_size == 0) {
+                element_size = arrays[i]->element_size;
+            }
+        }
+    }
+    va_end(args);
+    
+    if (total_length == 0 || element_size == 0) return NULL;
+    
+    // Create result array
+    elegant_array_t* result = elegant_create_array_impl(element_size, NULL, total_length);
+    if (!result) return NULL;
+    
+    // Second pass: copy data
+    char* dest_data = (char*)elegant_array_get_data(result);
+    size_t offset = 0;
+    
+    for (size_t i = 0; i < count; i++) {
+        if (arrays[i]) {
+            size_t len = elegant_array_get_length(arrays[i]);
+            if (len > 0) {
+                char* src_data = (char*)elegant_array_get_data(arrays[i]);
+                size_t copy_bytes = len * element_size;
+                size_t remaining_bytes = (total_length * element_size) - offset;
+                
+                if (elegant_memcpy_safe(dest_data + offset, remaining_bytes, 
+                                      src_data, copy_bytes) != 0) {
+                    elegant_array_destroy(result);
+                    return NULL;
+                }
+                offset += copy_bytes;
+            }
+        }
+    }
+    
+    return result;
 }

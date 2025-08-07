@@ -159,4 +159,11 @@ int* elegant_find_int(elegant_array_t* src, int (*predicate)(int));
 float* elegant_find_float(elegant_array_t* src, int (*predicate)(float));
 double* elegant_find_double(elegant_array_t* src, int (*predicate)(double));
 
+/* CONCAT - concatenate multiple arrays into a new array */
+elegant_array_t* elegant_concat_arrays(size_t count, ...);
+
+#define ELEGANT_CONCAT(...) elegant_concat_arrays( \
+    sizeof((elegant_array_t*[]){__VA_ARGS__}) / sizeof(elegant_array_t*), \
+    __VA_ARGS__)
+
 #endif /* ELEGANT_COLLECTION_H */

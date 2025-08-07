@@ -54,4 +54,7 @@ elegant_array_t* elegant_create_array_impl(size_t element_size, void* data, size
 #define ELEGANT_CHECK_ARRAY_SIZE(size) \
     ELEGANT_STATIC_ASSERT(size <= ELEGANT_MAX_ARRAY_SIZE)
 
+/* Safe memory copy function */
+int elegant_memcpy_safe(void* dest, size_t dest_size, const void* src, size_t copy_size);
+
 #endif /* ELEGANT_CORE_H */
