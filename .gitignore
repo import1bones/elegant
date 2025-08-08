@@ -94,3 +94,10 @@ elegant-*.tar.gz
 
 # Backup files
 *~
+.cache/**/*.idx
+
+examples/basic_examples
+examples/functional_demo
+examples/functional_quicksort
+examples/memory_safety_demo
+examples/safety_demo
