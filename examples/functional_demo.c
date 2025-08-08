@@ -43,7 +43,7 @@ int main(void) {
     printf("\n");
     
     // Reduce operation - sum all elements
-    int sum = REDUCE_INT(evens, a + b, 0);
+    int sum = REDUCE_INT(evens, acc + x, 0);
     printf("Sum of even numbers: %d\n", sum);
     
     // Test REVERSE operation
@@ -55,21 +55,18 @@ int main(void) {
     }
     printf("\n");
     
-    // Test TAKE operation
+    // Test TAKE and DROP
     elegant_array_t* first_three = TAKE(3, arr);
-    int* first_data = (int*)elegant_array_get_data(first_three);
-    printf("First 3: ");
+    printf("First three: ");
     for (size_t i = 0; i < elegant_array_get_length(first_three); i++) {
-        printf("%d ", first_data[i]);
+        printf("%d ", ELEGANT_GET(first_three, i, int));
     }
     printf("\n");
     
-    // Test DROP operation
     elegant_array_t* last_three = DROP(2, arr);
-    int* last_data = (int*)elegant_array_get_data(last_three);
-    printf("Last 3: ");
+    printf("Drop first 2: ");
     for (size_t i = 0; i < elegant_array_get_length(last_three); i++) {
-        printf("%d ", last_data[i]);
+        printf("%d ", ELEGANT_GET(last_three, i, int));
     }
     printf("\n");
     

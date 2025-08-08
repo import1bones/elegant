@@ -34,7 +34,7 @@ void example_basic_operations(void) {
         printf("\n");
         
         // REDUCE operation - sum all numbers
-        AUTO(sum, REDUCE_INT(numbers, a + b, 0));
+        AUTO(sum, REDUCE_INT(numbers, acc + x, 0));
         printf("Sum: %d\n", sum);
         
         // Array manipulation operations
@@ -74,7 +74,7 @@ void example_sequential_composition(void) {
         // Sequential functional operations (C99 compatible)
         AUTO(step1, MAP_INT(data, x * x));        // Square each number
         AUTO(step2, FILTER_INT(step1, x > 10));   // Keep values > 10
-        AUTO(final, REDUCE_INT(step2, a + b, 0)); // Sum the results
+        AUTO(final, REDUCE_INT(step2, acc + x, 0)); // Sum the results
         
         printf("Original: ");
         for (size_t i = 0; i < ELEGANT_LENGTH(data); i++) {
@@ -158,7 +158,7 @@ void example_memory_modes(void) {
         AUTO(arr1, elegant_create_array_int(1, 2, 3, 4, 5));
         printf("Created array, memory: %zu bytes\n", elegant_get_allocated_bytes());
         
-        AUTO(arr2, MAP(x, arr1, x * 2));
+        AUTO(arr2, MAP_INT(arr1, x * 2));
         printf("After MAP, memory: %zu bytes\n", elegant_get_allocated_bytes());
     }
     printf("After scope exit, memory: %zu bytes\n", elegant_get_allocated_bytes());
@@ -193,15 +193,15 @@ void example_different_types(void) {
     ELEGANT_SCOPE {
         // Integer arrays
         AUTO(ints, elegant_create_array_int(1, 2, 3));
-        AUTO(doubled_ints, MAP(x, ints, x * 2));
+        AUTO(doubled_ints, MAP_INT(ints, x * 2));
         
         // Float arrays  
         AUTO(floats, elegant_create_array_float(1.5f, 2.5f, 3.5f));
-        AUTO(squared_floats, MAP(x, floats, x * x));
+        AUTO(squared_floats, MAP_FLOAT(floats, x * x));
         
         // Double arrays
         AUTO(doubles, elegant_create_array_double(1.1, 2.2, 3.3));
-        AUTO(sqrt_doubles, MAP(x, doubles, sqrt(x)));
+        AUTO(sqrt_doubles, MAP_DOUBLE(doubles, sqrt(x)));
         
         printf("Doubled integers: ");
         for (size_t i = 0; i < ELEGANT_LENGTH(doubled_ints); i++) {

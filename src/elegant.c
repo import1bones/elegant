@@ -565,3 +565,299 @@ elegant_array_t* elegant_concat_arrays(size_t count, ...) {
     
     return result;
 }
+
+/* Generic collection operations */
+
+elegant_array_t* elegant_map_generic(elegant_array_t* src, void* (*func)(void*), size_t element_size) {
+    if (!src || !func) return NULL;
+    
+    size_t len = elegant_array_get_length(src);
+    elegant_array_t* result = elegant_array_create(element_size, len);
+    if (!result) return NULL;
+    
+    char* src_data = (char*)elegant_array_get_data(src);
+    char* dst_data = (char*)elegant_array_get_data(result);
+    
+    for (size_t i = 0; i < len; i++) {
+        void* element = src_data + (i * element_size);
+        void* mapped = func(element);
+        if (elegant_memcpy_safe(dst_data + (i * element_size), element_size, mapped, element_size) != 0) {
+            elegant_array_destroy(result);
+            return NULL;
+        }
+    }
+    
+    return result;
+}
+
+elegant_array_t* elegant_filter_generic(elegant_array_t* src, int (*predicate)(void*), size_t element_size) {
+    if (!src || !predicate) return NULL;
+    
+    size_t len = elegant_array_get_length(src);
+    char* src_data = (char*)elegant_array_get_data(src);
+    
+    // First pass: count matching elements
+    size_t count = 0;
+    for (size_t i = 0; i < len; i++) {
+        void* element = src_data + (i * element_size);
+        if (predicate(element)) count++;
+    }
+    
+    // Create result array
+    elegant_array_t* result = elegant_array_create(element_size, count);
+    if (!result) return NULL;
+    
+    // Second pass: copy matching elements
+    char* dst_data = (char*)elegant_array_get_data(result);
+    size_t idx = 0;
+    for (size_t i = 0; i < len; i++) {
+        void* element = src_data + (i * element_size);
+        if (predicate(element)) {
+            if (elegant_memcpy_safe(dst_data + (idx * element_size), element_size, element, element_size) != 0) {
+                elegant_array_destroy(result);
+                return NULL;
+            }
+            idx++;
+        }
+    }
+    
+    return result;
+}
+
+void* elegant_reduce_generic(elegant_array_t* src, void* (*func)(void*, void*), void* initial, size_t element_size) {
+    if (!src || !func || !initial) return initial;
+    
+    size_t len = elegant_array_get_length(src);
+    char* src_data = (char*)elegant_array_get_data(src);
+    
+    void* accumulator = malloc(element_size);
+    if (!accumulator) return initial;
+    
+    if (elegant_memcpy_safe(accumulator, element_size, initial, element_size) != 0) {
+        free(accumulator);
+        return initial;
+    }
+    
+    for (size_t i = 0; i < len; i++) {
+        void* element = src_data + (i * element_size);
+        void* new_acc = func(accumulator, element);
+        if (elegant_memcpy_safe(accumulator, element_size, new_acc, element_size) != 0) {
+            free(accumulator);
+            return initial;
+        }
+    }
+    
+    return accumulator;
+}
+
+void* elegant_fold_left_generic(elegant_array_t* src, void* (*func)(void*, void*), void* initial, size_t element_size) {
+    return elegant_reduce_generic(src, func, initial, element_size);
+}
+
+void* elegant_fold_right_generic(elegant_array_t* src, void* (*func)(void*, void*), void* initial, size_t element_size) {
+    if (!src || !func || !initial) return initial;
+    
+    size_t len = elegant_array_get_length(src);
+    char* src_data = (char*)elegant_array_get_data(src);
+    
+    void* accumulator = malloc(element_size);
+    if (!accumulator) return initial;
+    
+    if (elegant_memcpy_safe(accumulator, element_size, initial, element_size) != 0) {
+        free(accumulator);
+        return initial;
+    }
+    
+    // Process from right to left
+    for (size_t i = len; i > 0; i--) {
+        void* element = src_data + ((i-1) * element_size);
+        void* new_acc = func(element, accumulator);
+        if (elegant_memcpy_safe(accumulator, element_size, new_acc, element_size) != 0) {
+            free(accumulator);
+            return initial;
+        }
+    }
+    
+    return accumulator;
+}
+
+void* elegant_find_generic(elegant_array_t* src, int (*predicate)(void*), size_t element_size) {
+    if (!src || !predicate) return NULL;
+    
+    size_t len = elegant_array_get_length(src);
+    char* src_data = (char*)elegant_array_get_data(src);
+    
+    for (size_t i = 0; i < len; i++) {
+        void* element = src_data + (i * element_size);
+        if (predicate(element)) {
+            return element;
+        }
+    }
+    
+    return NULL;
+}
+
+elegant_array_t* elegant_reverse(elegant_array_t* arr) {
+    if (!arr) return NULL;
+    
+    size_t len = elegant_array_get_length(arr);
+    size_t element_size = arr->element_size;
+    elegant_array_t* result = elegant_array_create(element_size, len);
+    if (!result) return NULL;
+    
+    char* src_data = (char*)elegant_array_get_data(arr);
+    char* dst_data = (char*)elegant_array_get_data(result);
+    
+    for (size_t i = 0; i < len; i++) {
+        void* src_element = src_data + (i * element_size);
+        void* dst_element = dst_data + ((len - 1 - i) * element_size);
+        if (elegant_memcpy_safe(dst_element, element_size, src_element, element_size) != 0) {
+            elegant_array_destroy(result);
+            return NULL;
+        }
+    }
+    
+    return result;
+}
+
+elegant_array_t* elegant_take(elegant_array_t* arr, size_t n) {
+    if (!arr) return NULL;
+    
+    size_t len = elegant_array_get_length(arr);
+    size_t take_len = (n < len) ? n : len;
+    size_t element_size = arr->element_size;
+    
+    elegant_array_t* result = elegant_array_create(element_size, take_len);
+    if (!result) return NULL;
+    
+    if (take_len > 0) {
+        char* src_data = (char*)elegant_array_get_data(arr);
+        char* dst_data = (char*)elegant_array_get_data(result);
+        size_t copy_bytes = take_len * element_size;
+        
+        if (elegant_memcpy_safe(dst_data, copy_bytes, src_data, copy_bytes) != 0) {
+            elegant_array_destroy(result);
+            return NULL;
+        }
+    }
+    
+    return result;
+}
+
+elegant_array_t* elegant_drop(elegant_array_t* arr, size_t n) {
+    if (!arr) return NULL;
+    
+    size_t len = elegant_array_get_length(arr);
+    if (n >= len) {
+        return elegant_array_create(arr->element_size, 0);
+    }
+    
+    size_t drop_len = len - n;
+    size_t element_size = arr->element_size;
+    
+    elegant_array_t* result = elegant_array_create(element_size, drop_len);
+    if (!result) return NULL;
+    
+    char* src_data = (char*)elegant_array_get_data(arr);
+    char* dst_data = (char*)elegant_array_get_data(result);
+    char* src_start = src_data + (n * element_size);
+    size_t copy_bytes = drop_len * element_size;
+    
+    if (elegant_memcpy_safe(dst_data, copy_bytes, src_start, copy_bytes) != 0) {
+        elegant_array_destroy(result);
+        return NULL;
+    }
+    
+    return result;
+}
+
+elegant_array_t* elegant_zip(elegant_array_t* arr1, elegant_array_t* arr2, void* (*combiner)(void*, void*), size_t result_element_size) {
+    if (!arr1 || !arr2 || !combiner) return NULL;
+    
+    size_t len1 = elegant_array_get_length(arr1);
+    size_t len2 = elegant_array_get_length(arr2);
+    size_t min_len = (len1 < len2) ? len1 : len2;
+    
+    elegant_array_t* result = elegant_array_create(result_element_size, min_len);
+    if (!result) return NULL;
+    
+    char* data1 = (char*)elegant_array_get_data(arr1);
+    char* data2 = (char*)elegant_array_get_data(arr2);
+    char* result_data = (char*)elegant_array_get_data(result);
+    
+    for (size_t i = 0; i < min_len; i++) {
+        void* elem1 = data1 + (i * arr1->element_size);
+        void* elem2 = data2 + (i * arr2->element_size);
+        void* combined = combiner(elem1, elem2);
+        
+        if (elegant_memcpy_safe(result_data + (i * result_element_size), result_element_size, combined, result_element_size) != 0) {
+            elegant_array_destroy(result);
+            return NULL;
+        }
+    }
+    
+    return result;
+}
+
+
+/* Advanced array operations */
+
+elegant_array_t* elegant_reverse_int(elegant_array_t* arr) {
+    if (!arr) return NULL;
+    
+    size_t len = elegant_array_get_length(arr);
+    elegant_array_t* result = elegant_array_create(sizeof(int), len);
+    if (!result) return NULL;
+    
+    int* src_data = (int*)elegant_array_get_data(arr);
+    int* dst_data = (int*)elegant_array_get_data(result);
+    
+    for (size_t i = 0; i < len; i++) {
+        dst_data[i] = src_data[len - 1 - i];
+    }
+    
+    return result;
+}
+
+elegant_array_t* elegant_take_int(elegant_array_t* arr, size_t n) {
+    if (!arr) return NULL;
+    
+    size_t len = elegant_array_get_length(arr);
+    size_t take_len = (n < len) ? n : len;
+    
+    elegant_array_t* result = elegant_array_create(sizeof(int), take_len);
+    if (!result) return NULL;
+    
+    if (take_len > 0) {
+        int* src_data = (int*)elegant_array_get_data(arr);
+        int* dst_data = (int*)elegant_array_get_data(result);
+        
+        for (size_t i = 0; i < take_len; i++) {
+            dst_data[i] = src_data[i];
+        }
+    }
+    
+    return result;
+}
+
+elegant_array_t* elegant_drop_int(elegant_array_t* arr, size_t n) {
+    if (!arr) return NULL;
+    
+    size_t len = elegant_array_get_length(arr);
+    if (n >= len) {
+        return elegant_array_create(sizeof(int), 0);
+    }
+    
+    size_t drop_len = len - n;
+    elegant_array_t* result = elegant_array_create(sizeof(int), drop_len);
+    if (!result) return NULL;
+    
+    int* src_data = (int*)elegant_array_get_data(arr);
+    int* dst_data = (int*)elegant_array_get_data(result);
+    
+    for (size_t i = 0; i < drop_len; i++) {
+        dst_data[i] = src_data[n + i];
+    }
+    
+    return result;
+}

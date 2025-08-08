@@ -83,6 +83,7 @@ size_t elegant_array_get_length(elegant_array_t* arr);
 /* Include sub-headers */
 #include "elegant_core.h"
 #include "elegant_collection.h"
+#include "elegant_advanced.h"
 #include "elegant_memory.h"
 #include "elegant_maybe.h"
 #include "elegant_either.h"
