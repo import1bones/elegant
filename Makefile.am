@@ -6,7 +6,11 @@ SUBDIRS += examples
 endif
 
 # Documentation and distribution files
-EXTRA_DIST = README.md LICENSE INSTALL NEWS docs/overview.md
+EXTRA_DIST = README.md LICENSE INSTALL NEWS \
+    docs/overview.md \
+    docs/memory_safety.md \
+    docs/api_reference.md \
+    docs/compile_commands_guide.md
 
 # Include headers in distribution
 elegantincludedir = $(includedir)/elegant
@@ -14,10 +18,12 @@ elegantinclude_HEADERS = \
     inc/elegant.h \
     inc/elegant_core.h \
     inc/elegant_collection.h \
+    inc/elegant_advanced.h \
     inc/elegant_memory.h \
     inc/elegant_maybe.h \
     inc/elegant_either.h \
-    inc/elegant_scope.h
+    inc/elegant_scope.h \
+    inc/elegant_safety.h
 
 # pkg-config file
 pkgconfigdir = $(libdir)/pkgconfig
