@@ -2,6 +2,15 @@
 
 Elegant is a C library that brings Haskell-like functional programming features to the C language with automatic memory management and type safety.
 
+## ⚠️ Compiler Requirements
+
+**This library requires GCC (GNU Compiler Collection) for compilation.**
+
+- ✅ **Supported**: GCC with C99 support
+- ❌ **Not supported**: Clang, MSVC, or other compilers
+
+The library uses GNU C extensions (nested functions) that are not available in other compilers. See [COMPILER_REQUIREMENTS.md](COMPILER_REQUIREMENTS.md) for detailed installation instructions.
+
 ## Features
 
 - **Haskell-like functional programming macros and idioms**

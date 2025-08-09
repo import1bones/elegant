@@ -29,6 +29,11 @@ extern "C" {
 #warning "Elegant works best with GCC or Clang for type-generic features"
 #endif
 
+/* IMPORTANT: This library requires GCC for full functionality */
+#if defined(__clang__) || defined(_MSC_VER) || defined(__INTEL_COMPILER)
+#warning "NOTICE: Elegant Library requires GCC for nested functions support. Some features may not compile with Clang, MSVC, or other compilers."
+#endif
+
 /* AUTO macro for type deduction (C99 compatible) */
 #define AUTO(var, expr) __typeof__(expr) var = (expr)
 

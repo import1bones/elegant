@@ -96,7 +96,9 @@ void* elegant_fold_right_generic(elegant_array_t* src, void* (*func)(void*, void
     _partial_data; \
 })
 
-/* Legacy type-specific macros for backwards compatibility */
+/* Compiler compatibility check and type-specific macros */
+#if defined(__GNUC__) && !defined(__clang__)
+/* GCC version with nested functions support */
 #define MAP_INT(arr, expr) ({ \
     int _map_func(int x) { return (expr); } \
     elegant_map_int((arr), _map_func); \
@@ -136,14 +138,21 @@ void* elegant_fold_right_generic(elegant_array_t* src, void* (*func)(void*, void
     elegant_reduce_double((arr), _reduce_func, (initial)); \
 })
 
-/* Additional macros for backwards compatibility */
-#define REVERSE(arr) elegant_reverse(arr)
-#define TAKE(n, arr) elegant_take(arr, n)
-#define DROP(n, arr) elegant_drop(arr, n)
 #define FIND_INT(arr, predicate) ({ \
     int _find_func(int x) { return (predicate); } \
     elegant_find_int((arr), _find_func); \
 })
+
+#else
+/* Unsupported compiler */
+#error "ELEGANT LIBRARY ERROR: This library requires GCC with nested functions support. Current compiler (likely Clang) is not supported. On macOS: 'brew install gcc', then use 'CC=gcc-13 make' (replace 13 with your GCC version)."
+
+#endif /* defined(__GNUC__) && !defined(__clang__) */
+
+/* Additional macros for backwards compatibility */
+#define REVERSE(arr) elegant_reverse(arr)
+#define TAKE(n, arr) elegant_take(arr, n)
+#define DROP(n, arr) elegant_drop(arr, n)
 
 /* Additional functional operations */
 
