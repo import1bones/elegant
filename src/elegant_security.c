@@ -3,14 +3,54 @@
  * Demonstrates functional programming patterns for security operations
  */
 
-#define _POSIX_C_SOURCE 200809L
 #include "../inc/elegant.h"
 #include "../inc/elegant_security.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
-#include <strings.h>
+
+/* Portable string functions */
+#ifndef HAVE_STRDUP
+static char* portable_strdup(const char* s) {
+    if (!s) return NULL;
+    size_t len = strlen(s) + 1;
+    char* result = malloc(len);
+    if (result) {
+        memcpy(result, s, len);
+    }
+    return result;
+}
+#define strdup portable_strdup
+#endif
+
+#ifndef HAVE_STRCASECMP
+static int portable_strcasecmp(const char* s1, const char* s2) {
+    if (!s1 || !s2) return s1 ? 1 : (s2 ? -1 : 0);
+    
+    while (*s1 && *s2) {
+        int c1 = tolower((unsigned char)*s1);
+        int c2 = tolower((unsigned char)*s2);
+        if (c1 != c2) return c1 - c2;
+        s1++;
+        s2++;
+    }
+    return tolower((unsigned char)*s1) - tolower((unsigned char)*s2);
+}
+#define strcasecmp portable_strcasecmp
+#endif
+
+#ifndef HAVE_STRNLEN
+static size_t portable_strnlen(const char* s, size_t maxlen) {
+    if (!s) return 0;
+    size_t len = 0;
+    while (len < maxlen && s[len]) {
+        len++;
+    }
+    return len;
+}
+#define strnlen portable_strnlen
+#endif
 
 /* =============================================================================
  * Character Class Predicates (for Functional Filtering)

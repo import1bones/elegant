@@ -146,22 +146,10 @@ void elegant_secure_memzero(void* ptr, size_t size);
 
 /* =============================================================================
  * Security Rule Composition (Functional Combinators)
+ * Note: Advanced rule composition features are planned for future releases.
+ * Currently, rules are combined using the elegant_validate_password function
+ * which applies all rules with AND logic.
  * ============================================================================= */
-
-/* Combine multiple rules with AND logic */
-elegant_password_rule_t elegant_rule_and(
-    elegant_password_rule_t rule1,
-    elegant_password_rule_t rule2
-);
-
-/* Combine multiple rules with OR logic */
-elegant_password_rule_t elegant_rule_or(
-    elegant_password_rule_t rule1,
-    elegant_password_rule_t rule2
-);
-
-/* Negate a rule (NOT logic) */
-elegant_password_rule_t elegant_rule_not(elegant_password_rule_t rule);
 
 /* =============================================================================
  * Security Utilities

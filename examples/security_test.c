@@ -266,11 +266,15 @@ void test_secure_memzero(void) {
     TEST("secure memory zeroing");
     
     char sensitive[16];
-    memset(sensitive, 'X', sizeof(sensitive));
+    // Initialize with pattern (using loop to avoid memset optimization issues)
+    for (size_t i = 0; i < sizeof(sensitive); i++) {
+        sensitive[i] = 'X';
+    }
     
+    // Use secure zeroing function
     elegant_secure_memzero(sensitive, sizeof(sensitive));
     
-    // Verify all bytes are zero
+    // Verify all bytes are zero (secure_memzero should not be optimized away)
     for (size_t i = 0; i < sizeof(sensitive); i++) {
         assert(sensitive[i] == 0);
     }
