@@ -23,6 +23,7 @@ The library uses GNU C extensions (nested functions) that are not available in o
 - **Inline lambda expressions** for concise functional code
 - **Error handling** with Maybe/Option and Either types
 - **Pre-compiler checks** for type safety and memory leak detection
+- **Security library** demonstrating functional patterns for password validation, input sanitization, and cryptographic operations
 - **Declarative and expressive code style**
 
 ## Quick Example
@@ -231,6 +232,9 @@ With `--enable-examples`:
 
 # Basic operations examples
 ./examples/basic_examples
+
+# Security library demonstration
+./examples/security_example
 ```
 
 ### Test Suite
@@ -244,6 +248,67 @@ Runs the built-in test suite that validates:
 - Memory management
 - Array operations
 - Type safety
+
+## Security Library
+
+Elegant includes a comprehensive security library that demonstrates functional programming patterns for security-critical operations:
+
+### Password Validation
+- Composable validation rules
+- Password strength scoring
+- Character class requirements
+- Common password detection
+
+```c
+#include <elegant_security.h>
+
+elegant_password_rule_t rules[] = {
+    elegant_rule_min_length,
+    elegant_rule_has_uppercase,
+    elegant_rule_has_lowercase,
+    elegant_rule_has_digit,
+    elegant_rule_has_special
+};
+
+elegant_security_result_t result = elegant_validate_password(
+    "MyP@ssw0rd", rules, 5
+);
+```
+
+### Input Sanitization
+- SQL injection prevention
+- HTML/XSS prevention
+- Path traversal protection
+- Functional string filtering
+
+```c
+// Filter using functional pattern
+char* clean = elegant_filter_string(input, elegant_is_safe_alphanumeric);
+
+// Escape SQL input
+char* safe_sql = elegant_escape_sql("admin' OR '1'='1");
+
+// Sanitize HTML
+char* safe_html = elegant_escape_html("<script>alert('XSS')</script>");
+```
+
+### Cryptographic Hash Functions
+- Multiple hash algorithms (DJB2, SDBM, FNV-1a)
+- Functional hash composition
+- Demonstrates MAP/REDUCE patterns
+
+```c
+// Compose multiple hash functions
+elegant_hash_func_t funcs[] = {
+    elegant_hash_djb2,
+    elegant_hash_sdbm,
+    elegant_hash_fnv1a
+};
+
+uint64_t hash = elegant_hash_combine(data, length, funcs, 3);
+```
+
+See [docs/security_library.md](docs/security_library.md) for complete documentation.
 
 ## Documentation
 
