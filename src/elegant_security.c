@@ -463,6 +463,8 @@ uint64_t elegant_hash_password(const char* password, const char* salt) {
     
     uint64_t hash = elegant_hash_combine(combined, total_len, funcs, 3);
     
+    // Securely clear sensitive data before freeing
+    elegant_secure_memzero(combined, total_len);
     free(combined);
     return hash;
 }

@@ -101,3 +101,5 @@ examples/functional_demo
 examples/functional_quicksort
 examples/memory_safety_demo
 examples/safety_demo
+examples/security_example
+examples/security_test
