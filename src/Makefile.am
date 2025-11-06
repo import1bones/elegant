@@ -1,6 +1,6 @@
 lib_LTLIBRARIES = libelegant.la
 
-libelegant_la_SOURCES = elegant.c elegant_safety.c
+libelegant_la_SOURCES = elegant.c elegant_safety.c elegant_security.c
 
 # Include paths
 AM_CPPFLAGS = -I$(top_srcdir)/inc

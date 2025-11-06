@@ -94,6 +94,7 @@ size_t elegant_array_get_length(elegant_array_t* arr);
 #include "elegant_either.h"
 #include "elegant_scope.h"
 #include "elegant_safety.h"
+#include "elegant_security.h"
 
 #ifdef __cplusplus
 }
