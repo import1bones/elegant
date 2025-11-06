@@ -10,7 +10,8 @@ EXTRA_DIST = README.md LICENSE INSTALL NEWS \
     docs/overview.md \
     docs/memory_safety.md \
     docs/api_reference.md \
-    docs/compile_commands_guide.md
+    docs/compile_commands_guide.md \
+    docs/security_library.md
 
 # Include headers in distribution
 elegantincludedir = $(includedir)/elegant
@@ -23,7 +24,8 @@ elegantinclude_HEADERS = \
     inc/elegant_maybe.h \
     inc/elegant_either.h \
     inc/elegant_scope.h \
-    inc/elegant_safety.h
+    inc/elegant_safety.h \
+    inc/elegant_security.h
 
 # pkg-config file
 pkgconfigdir = $(libdir)/pkgconfig
@@ -35,6 +37,10 @@ check-local:
 	@if test -x examples/functional_demo; then \
 		examples/functional_demo; \
 		echo "✓ Functional operations test passed!"; \
+		echo ""; \
+		echo "Running Elegant Security Library tests..."; \
+		examples/security_test; \
+		echo "✓ Security library tests passed!"; \
 	else \
 		echo "Examples not built - run ./configure --enable-examples"; \
 	fi

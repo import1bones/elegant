@@ -1,7 +1,7 @@
 if BUILD_EXAMPLES
 
 
-noinst_PROGRAMS = functional_demo basic_examples functional_quicksort safety_demo memory_safety_demo security_example
+noinst_PROGRAMS = functional_demo basic_examples functional_quicksort safety_demo memory_safety_demo security_example security_test
 
 # Common settings for all examples
 AM_CPPFLAGS = -I$(top_srcdir)/inc
@@ -19,6 +19,8 @@ safety_demo_SOURCES = safety_demo.c
 memory_safety_demo_SOURCES = memory_safety_demo.c
 # security library example
 security_example_SOURCES = security_example.c
+# security library tests
+security_test_SOURCES = security_test.c
 # simple_examples_SOURCES = simple_examples.c  # TODO: Fix Maybe/Either types
 # test_suite_SOURCES = test_suite.c  # TODO: Fix test implementation
 
